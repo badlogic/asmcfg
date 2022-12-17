@@ -2,6 +2,7 @@ import { AssemblyFunction } from "./types";
 import * as graphlibDot from "graphlib-dot"
 import * as dagreD3 from "dagre-d3"
 import {select as d3Select} from "d3-selection";
+import { Graph } from "graphlib";
 
 export function renderDot(func: AssemblyFunction) {
     let dot = 'digraph {\n';
@@ -40,9 +41,21 @@ export function renderDot(func: AssemblyFunction) {
     return dot;
 }
 
-export async function renderSvg(func: AssemblyFunction, svgElement: SVGElement) {
+export async function renderGraphlib(func: AssemblyFunction) {
     const dot = renderDot(func);
     let graph = await graphlibDot.read(dot);
+    return graph;
+}
+
+export async function renderSvg(func: AssemblyFunction, svgElement: SVGElement) {
+    let graph = await renderGraphlib(func);
     var render = new dagreD3.render;
     d3Select(svgElement.querySelector("g")).call(render, graph);
+    return svgElement;
+}
+
+export async function renderSvgFromGraphlib(graph: Graph, svgElement: SVGElement) {
+    var render = new dagreD3.render;
+    d3Select(svgElement.querySelector("g")).call(render, graph);
+    return svgElement;
 }

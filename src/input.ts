@@ -1,5 +1,5 @@
 import * as panzoom from "panzoom"
-import { AssemblyFunction } from "./types";
+import { Node, AssemblyFunction } from "./types";
 
 export function makeInteractive(element: HTMLElement, func: AssemblyFunction | null = null, clickCallback: (lineStart: number, lineEnd: number, node: Node, func: AssemblyFunction) => void = () => { }) {
     if ((element as any)["_asmcfg_zoom"]) {

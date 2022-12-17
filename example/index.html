@@ -71,6 +71,9 @@
             <select id="function-name">
             </select>
         </label>
+        <label>
+            Highlight true/false branches: <input id="true-false-branches" checked type="checkbox">
+        </label>
     </div>
     <div id="container">
         <pre id="code-view"></pre>
@@ -89,12 +92,16 @@
         let functionName = document.querySelector("#function-name");
         let codeView = document.querySelector("#code-view");
         let svgGraph = document.querySelector("#svg-graph");
+        let trueFalseBranches = document.querySelector("#true-false-branches");
 
         // IF the user selected a different file, set it as the current example
         exampleFile.addEventListener("change", () => setExample(exampleFile.value));
 
         // If the user selected a different function, render it
         functionName.addEventListener("change", () => renderFunction(functions[Number.parseInt(functionName.value)]));
+
+        // If the user (un-)checked the true/false branches checkbox, re-render the function
+        trueFalseBranches.addEventListener("change", () => renderFunction(functions[Number.parseInt(functionName.value)]));
 
         async function setExample(url) {
             // Fetch the example file from the url and populate the code view
@@ -122,11 +129,39 @@
 
         async function renderFunction(func) {
             // Render the function to the SVG element
-            await asmcfg.renderSvg(func, svgGraph);
+            if (!trueFalseBranches.checked) {
+                // Simple case, styling is done via CSS
+                await asmcfg.renderSvg(func, svgGraph);
+            } else {
+                // Complex case, styling is done by modifying graphlib nodes and edges.
+                // See https://dagrejs.github.io/project/dagre-d3/latest/demo/style-attrs.html
+                let graph = await asmcfg.renderGraphlib(func);
+                let edges = graph.edges();
+                for (let i = 0; i < edges.length; i++) {
+                    let edge = edges[i];
+                    let fromNode = func.nodes[edge.v];
+                    let toNode = func.nodes[edge.w];
+
+                    // Highlight edges green or red, based on whether they are a result of a taken
+                    // conditional jump (green), or a fall through (red). To determine this, we
+                    // check if the last line of the "from" node has the label of the "to" node.
+                    if (toNode.label) {
+                        if (fromNode.lines.length > 0 && fromNode.lines[fromNode.lines.length - 1].indexOf(toNode.label) >= 0)
+                            graph.setEdge(edge.v, edge.w, { style: "stroke: #00aa00" });
+                        else
+                            graph.setEdge(edge.v, edge.w, { style: "stroke: #aa0000" });
+                    } else {
+                        graph.setEdge(edge.v, edge.w, { style: "stroke: #aa0000" });
+                    }
+                }
+
+                // Render the styled graphlib graph to the SVG element.
+                await asmcfg.renderSvgFromGraphlib(graph, svgGraph);
+            }
 
             // Enable panning and zooming on the SVG element's root group
             asmcfg.makeInteractive(svgGraph.querySelector("g"), func, (lineStart, lineEnd, node, func) => {
-                let message = "Clicked node of function " + func.name + ", line start: " + lineStart + ", line end:" + lineEnd +  "\n\n" + node.lines.join("\n");
+                let message = `Clicked node of ${func.name}, lines ${lineStart}-${lineEnd}\n\n${node.lines.join("\n")}`;
                 alert(message);
             });
         }
