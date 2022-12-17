@@ -1,4 +1,5 @@
 # asmcfg
+![screenshot.png](screenshot.png)
 An assembly control flow graph/basic block visualizer for the web.
 
 ## What does it do?
@@ -140,6 +141,9 @@ The graph building code is ISA agnostic for the most part, and will likely work 
 The only ISA specific code is in [`isUnconditionalJump()`](src/parser.ts), It checks if a line contains an ISA specific unconditional jump. To add support for more ISAs, you should add the unconditional jump mnemonics for that ISA.
 
 `asmcfg` is also pretty lenient concerning the assembly code format. The [parsers](src/parser.ts) try to identify function boundaries first. Then, the labels within each function are identified. Adding support for a different assembly code format requires applying a heuristic to identify which format the code is in in `parse()`, and then implementing a new `parseMyFormat()` function that returns the set of functions and their labels. See the existing parsers for an example.
+
+## Bundle size considerations
+Since `asmcfg` depends on `dagre-d3`, `graphlib`, and `d3`, the bundle size of `asmcfg.min.js` comes out a bit on the fat side with 510kb minimized. However, gzipped we get 164kb, which is acceptable. If you know of a lighter-weight, zero-dependency graph layouting library, let me know.
 
 ## Will you add feature X?
 Unlikely, unless I have a need for it myself, or it's a neat idea.
