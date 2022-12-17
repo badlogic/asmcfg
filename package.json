@@ -5,40 +5,49 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
-      "dist/**/*",
-      "README.md",
-      "LICENSE"
+        "dist/**/*",
+        "README.md",
+        "LICENSE"
     ],
     "scripts": {
-      "prepublish": "npm run clean && npm run build",
-      "clean": "rimraf dist",
-      "build": "npm run build:esm && npm run build:iife && npm run build:iife:min",
-      "build:esm": "tsc --module es2015 --target es6 --outDir dist/",
-      "build:iife": "npx esbuild --bundle src/index.ts --sourcemap --outfile=dist/iife/asmcfg.js --format=iife --global-name=asmcfg",
-      "build:iife:min": "npx esbuild --minify dist/iife/asmcfg.js --sourcemap --outfile=dist/iife/asmcfg.min.js",
-      "dev": "concurrently \"npm run build:iife -- --watch\" \"npx live-server --no-browser\""
+        "prepublish": "npm run clean && npm run build",
+        "clean": "rimraf dist",
+        "build": "npm run build:esm && npm run build:iife && npm run build:iife:min",
+        "build:esm": "tsc --module es2015 --target es6 --outDir dist/",
+        "build:iife": "npx esbuild --bundle src/index.ts --sourcemap --outfile=dist/iife/asmcfg.js --format=iife --global-name=asmcfg",
+        "build:iife:min": "npx esbuild --minify dist/iife/asmcfg.js --sourcemap --outfile=dist/iife/asmcfg.min.js",
+        "dev": "concurrently \"npm run build:iife -- --watch\" \"npx live-server --no-browser\""
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/badlogic/asmcfg.git"
+        "type": "git",
+        "url": "git+https://github.com/badlogic/asmcfg.git"
     },
     "keywords": [
-      "assembly",
-      "control flow graph",
-      "svg",
-      "graph layout"
+        "assembly",
+        "control flow graph",
+        "svg",
+        "graph layout"
     ],
     "author": "Mario Zechner",
     "license": "BSD",
     "bugs": {
-      "url": "https://github.com/badlogic/asmcfg/issues"
+        "url": "https://github.com/badlogic/asmcfg/issues"
     },
     "homepage": "https://github.com/badlogic/asmcfg",
     "devDependencies": {
-      "concurrently": "^7.6.0",
-      "esbuild": "^0.16.8",
-      "live-server": "^1.2.2",
-      "rimraf": "^3.0.2",
-      "typescript": "^4.9.4"
+        "@types/dagre-d3": "^0.6.3",
+        "@types/graphlib": "^2.1.8",
+        "@types/graphlib-dot": "^0.6.1",
+        "concurrently": "^7.6.0",
+        "esbuild": "^0.16.8",
+        "live-server": "^1.2.2",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.9.4"
+    },
+    "dependencies": {
+        "d3": "^7.7.0",
+        "dagre-d3": "^0.6.4",
+        "graphlib-dot": "^0.6.4",
+        "panzoom": "^9.4.3"
     }
-  }
+}

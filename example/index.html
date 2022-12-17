@@ -1,13 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assembly CFG example</title>
-    <script src='dist/iife/asmcfg.js'></script>
-</head>
-<body>
+    <script src='../dist/iife/asmcfg.js'></script>
 
+    <style>
+        /* Style node contents via the .node class */
+        .node {
+            white-space: nowrap;
+            font-family: Courier;
+        }
+
+        /* Style node bounding rectangle */
+        .node rect {
+            stroke: #333;
+            fill: #fff;
+            stroke-width: 1.5px;
+        }
+
+        /* Style edges */
+        .edgePath path.path {
+            stroke: #333;
+            stroke-width: 1.5px;
+            fill: none;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: 600px;
+        }
+
+        #code-view {
+            flex: 1;
+            border: 1px solid #999;
+            resize: none;
+            overflow: scroll;
+            margin: 0;
+        }
+
+        #svg-graph {
+            flex: 1;
+            border: 1px solid #999;
+            overflow: hidden;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Assembly CFG example</h1>
+    <div>
+        <label>
+            File:
+            <select id="example-file">
+                <option selected value="files/example-msvc.asm">example-msvc.asm</option>
+                <option value="files/example-clang.s">example-clang.s</option>
+                <option value="files/example-gcc.s">example-gcc.s</option>
+                <option value="files/trivial-clang.s">trivial-clang.s</option>
+            </select>
+        </label>
+        <label>
+            Function:
+            <select id="function-name">
+            </select>
+        </label>
+    </div>
+    <div id="container">
+        <pre id="code-view"></pre>
+        <svg id="svg-graph">
+            <g />
+        </svg>
+    </div>
+
+    <script>
+        // Global holding all functions parsed from the selected assembly file.
+        // See setExample().
+        let functions = null;
+
+        // Get all DOM elements into local variable for easier access
+        let exampleFile = document.querySelector("#example-file");
+        let functionName = document.querySelector("#function-name");
+        let codeView = document.querySelector("#code-view");
+        let svgGraph = document.querySelector("#svg-graph");
+
+        // IF the user selected a different file, set it as the current example
+        exampleFile.addEventListener("change", () => setExample(exampleFile.value));
+
+        // If the user selected a different function, render it
+        functionName.addEventListener("change", () => renderFunction(functions[Number.parseInt(functionName.value)]));
+
+        async function setExample(url) {
+            // Fetch the example file from the url and populate the code view
+            let response = await fetch(url);
+            if (!response.ok) throw new Error("Couldn't download example " + url);
+            let code = await response.text();
+            codeView.innerText = code;
+
+            // Parse the file contents into a list of functions. Each function
+            // is a graph
+            functions = asmcfg.parse(code);
+
+            // Populate the function select box with available function names
+            functionName.innerHTML = "";
+            for (let i = 0; i < functions.length; i++) {
+                let option = document.createElement("option");
+                option.innerText = functions[i].name;
+                option.value = i;
+                functionName.appendChild(option);
+            }
+
+            // Render the first function
+            renderFunction(functions[0]);
+        };
+
+        async function renderFunction(func) {
+            // Render the function to the SVG element
+            await asmcfg.renderSvg(func, svgGraph);
+
+            // Enable panning and zooming on the SVG element's root group
+            asmcfg.enablePanZoom(svgGraph.querySelector("g"));
+        }
+
+        setExample(exampleFile.value)
+    </script>
 </body>
+
 </html>
