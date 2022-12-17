@@ -13,6 +13,7 @@
         .node {
             white-space: nowrap;
             font-family: Courier;
+            cursor: pointer;
         }
 
         /* Style node bounding rectangle */
@@ -62,7 +63,7 @@
                 <option selected value="files/example-msvc.asm">example-msvc.asm</option>
                 <option value="files/example-clang.s">example-clang.s</option>
                 <option value="files/example-gcc.s">example-gcc.s</option>
-                <option value="files/trivial-clang.s">trivial-clang.s</option>
+                <option value="files/trivial-clang.s" selected>trivial-clang.s</option>
             </select>
         </label>
         <label>
@@ -124,7 +125,10 @@
             await asmcfg.renderSvg(func, svgGraph);
 
             // Enable panning and zooming on the SVG element's root group
-            asmcfg.enablePanZoom(svgGraph.querySelector("g"));
+            asmcfg.makeInteractive(svgGraph.querySelector("g"), func, (lineStart, lineEnd, node, func) => {
+                let message = "Clicked node of function " + func.name + ", line start: " + lineStart + ", line end:" + lineEnd +  "\n\n" + node.lines.join("\n");
+                alert(message);
+            });
         }
 
         setExample(exampleFile.value)

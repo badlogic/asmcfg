@@ -89,7 +89,7 @@ export function parseClangGccAssembly(lines: string[]) {
                 if (func) func.lineEnd = lineIndex;
 
                 // Create a new "current" function
-                func = new AssemblyFunction(label, lineIndex)
+                func = new AssemblyFunction(label, lineIndex + 1)
                 functions.push(func);
             }
         }
