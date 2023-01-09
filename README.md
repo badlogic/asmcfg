@@ -15,7 +15,7 @@ Check out the (almost) production ready app [Mario's Assembly CFG viewer](https:
 You can integrate `asmcfg` into your web app as an `IIFE` "module":
 
 ```
-<script src="https://cdn.jsdelivr.net/npm/@marioslab/asmcfg@latest/dist/iife/asmcfg.min.js">
+<script src="https://cdn.jsdelivr.net/npm/@marioslab/asmcfg@latest/dist/iife/asmcfg.min.js"></script>
 ```
 
 All classes and functions will then be available through the global `asmcfg` object.
